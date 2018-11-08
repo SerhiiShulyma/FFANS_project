@@ -9,7 +9,7 @@ public class ReadFile {
 		do {
 			i=fin.read();
 			if (i!=-1)
-				System.out.println((char) i);
+				System.out.print((char) i);
 		}
 		while(i!=-1);
 	} catch (IOException e) {
