@@ -1,3 +1,6 @@
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.*;
 
 
@@ -22,5 +25,24 @@ public class RegularExpresion {
 			b=true;
 		return b;
 	}
+	
+	
+	public static double Parse (String module, String constant, LinkedHashMap<String, String> MAC, LinkedHashMap<String, Double> CAV) {
+		double c=0;
+		Set<Map.Entry<String, String>> mac =MAC.entrySet();
+		Set<Map.Entry<String, Double>> cav =CAV.entrySet();
+		for (Map.Entry<String, String> x: mac) {
+			if (constant.equals(x.getKey())&& module.equals(x.getValue())){
+				for (Map.Entry<String, Double> y: cav) {
+					if (constant.equals(y.getKey())){
+						c=y.getValue();
+						break;
+					}
+				}
+			}  
+		}
+		return c;
+	}
+			
 	
 }
