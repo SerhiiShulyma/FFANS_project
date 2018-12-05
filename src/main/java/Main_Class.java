@@ -2,9 +2,8 @@
 public class Main_Class {
 
 	public static void main(String[] args) {
-
-		new ReadFile();
-		new Parameters();  
-   
+		Parameters param=new Parameters("D:\\Workspace\\FFANS_Project\\ffans_project\\File_Ini\\ff_model_parameters.ini");
+		System.out.println(param.FileType);
+		System.out.println(param.pi);
 	}
 }

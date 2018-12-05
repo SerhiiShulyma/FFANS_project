@@ -2,52 +2,56 @@ import java.io.*;
 import java.util.*;
 
 
+
 public class ReadFile {
 	
-	private LinkedHashMap<String, String> ModAndConst =new LinkedHashMap<String, String>(); 
-	private LinkedHashMap<String, Double> ConstAndValue =new LinkedHashMap<String, Double>();
+	private LinkedHashMap<String, LinkedHashMap<String, String>> modulesConstantsAndValues= new LinkedHashMap<String, LinkedHashMap<String,String>>();
+	private LinkedHashMap<String, String> constantsAndValues =new LinkedHashMap<String, String>();
 	
-	public LinkedHashMap<String, String> getModAndConst(){
-		return ModAndConst;
-	  }
-	
-	public LinkedHashMap<String, Double> getConstAndValue(){
-		return ConstAndValue;
-	  }
-	String adress = "D:\\Workspace\\FFANS_Project\\ffans_project\\File_Ini\\ff_model_parameters.ini";
-	
-	{
-		try (FileInputStream fin =new FileInputStream(adress)){
+	public ReadFile(String path)
+    {
+		try (FileInputStream fin =new FileInputStream(path)){
 			BufferedReader br =new BufferedReader (new InputStreamReader(fin));
 			
 			String  strLine;
 			String Modules=null;
-			
-			
-			
+	
 			while((strLine=br.readLine())!=null) {
-				
 	            //exception of empty lines!!
-	            if(strLine.length()==0) {
-	            	continue;
-	            }
+	            if(strLine.length()==0) {continue;}
 	            
-	            //module definition 
+	            //module definition and writing modules name in HashMap 
 	            else if (strLine.charAt(0)=='[') {
-	            	Modules=strLine;
-	            }
-	            
-	            //ModAndConst consist of constants' name and modules' name where they situated 
-	            //ConstAndValue consist of constants' name and their's value which is represented in Double form                       
-	              
-	            else if ((RegularExpresion.FindSymbol(strLine, "="))&& (Modules!=null)){
-	            	    String Mass[]=RegularExpresion.StringSpliter(strLine, "[=]");   	    
-	            	    ModAndConst.put (Mass[0], Modules);
-	            	    ConstAndValue.put(Mass[0], Double.parseDouble(Mass[1]));        	 
+	            	if(Modules!=null) {
+	            		modulesConstantsAndValues.put(Modules, constantsAndValues);
+	            		constantsAndValues=new LinkedHashMap<String, String>();
 	            	}
-			}	
+	            	Modules=RegularExpresion.SymbolReplacement(strLine, "[\\[\\]]", "");
+	            }
+	            //String dividing on two parts( constants and its values) and writing in HashMap                       
+	            else if ((RegularExpresion.FindSymbol(strLine, "="))){
+	            	//delete spaces from string
+	            	strLine=RegularExpresion.SymbolReplacement(strLine, "\\s+", "");
+	            	String constantsValue[]=RegularExpresion.StringSpliter(strLine, "[=]");  
+	            	constantsAndValues.put(constantsValue[0], constantsValue[1]);            	
+	            	}
+			}
+		//last module writing in HashMap 
+		modulesConstantsAndValues.put(Modules, constantsAndValues);		
 		} catch (IOException e) {
 			System.out.println ("Input-Output Exception" + e);
 		}
+	};
+	//Output value from LinkedHashMap as String
+	String get (String module, String variable) {
+		return modulesConstantsAndValues.get(module).get(variable);
+	}
+	//Output value from LinkedHashMap as Integer
+	int get (String module, String variable, int a) {
+		return Integer.parseInt(modulesConstantsAndValues.get(module).get(variable));
+	}
+	//Output value from LinkedHashMap as Double 
+	double get (String module, String variable, double a) {
+		return Double.parseDouble(modulesConstantsAndValues.get(module).get(variable));
 	}	
 }
