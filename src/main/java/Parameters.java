@@ -12,7 +12,7 @@ public class Parameters {
 	public double gamma_e;
 	public double gl_scale;
 	public double nano_size;
-	public double elta_r_init;
+	public double delta_r_init;
 	public double is_periodic;
 	public double a0;
 	public double dt_neel;
@@ -44,13 +44,14 @@ public class Parameters {
 	public int    BmanX;
 	public int    BmanY;
 	public int    BmanZ;
+	public int    pN;
 	public int    isAutoSetPosition;
 	public double distances;
 	public int    isShowInfo;
 	public double dt0;
 	public int    slow_steps;
 	public double smooth_r;
-	public int    is_large_mode;
+	public boolean    is_large_mode;
 	public double large_fraction;
 	public double k_large;
 	public int    load_at_start;
@@ -59,37 +60,11 @@ public class Parameters {
 	public int    ext_field_is_homo;
 	public int    auto_reversal;
 	public int    setting_plot;
-	public int    start_ideal;
+	public boolean    start_ideal;
 	public int    ScreenCaptureStep;
 	public int    AnalysisStep;
-	public double d1;
-	public double F1;
-	public double d2;
-	public double F2;
-	public double d3;
-	public double F3;
-	public double d4;
-	public double F4;
-	public double d5;
-	public double F5;
-	public double d6;
-	public double F6;
-	public double d7;
-	public double F7;
-	public double d8;
-	public double F8;
-	public double d9;
-	public double F9;
-	public double d10;
-	public double F10;
-	public double d11;
-	public double F11;
-	public double d12;
-	public double F12;
-	public double d13;
-	public double F13;
-	public double d14;
-	public double F14;
+	Vector_2D []  Diameter_And_Concentration;
+	int           N_points;
 	public int    PositionMax;
 	public double x1;
 	public double y1;
@@ -116,73 +91,32 @@ public class Parameters {
 	public double z6;
 	public int    pts6;
 	public int    n;
-	public int    T0;
-	public int    T1;
-	public int    T2;
-	public int    T3;
-	public int    T4;
-	public int    T5;
-	public int    T6;
-	public int    T7;
-	public int    T8;
-	public int    T9;
-	public int    T10;
-	public int    T11;
-	public int    T12;
-	public int    T13;
-	public int    T14;
-	public int    T15;
-	public int    T16;
-	public int    T17;
-	public int    T18;
-	public int    T19;
-	public int    T20;
-	public int    T21;
-	public int    T22;
-	public int    T23;
-	public int    T24;
-	public int    T25;
-	public int    T26;
-	public int    T27;
-	public double    eta0;
-	public double    eta1;
-	public double    eta2;
-	public double    eta3;
-	public double    eta4;
-	public double    eta5;
-	public double    eta6;
-	public double    eta7;
-	public double    eta8;
-	public double    eta9;
-	public double    eta10;
-	public double    eta11;
-	public double    eta12;
-	public double    eta13;
-	public double    eta14;
-	public double    eta15;
-	public double    eta16;
-	public double    eta17;
-	public double    eta18;
-	public double    eta19;
-	public double    eta20;
-	public double    eta21;
-	public double    eta22;
-	public double    eta23;
-	public double    eta24;
-	public double    eta25;
-	public double    eta26;
-	public double    eta27;
+	Vector_2D []  Temperature_And_Viscosity; 
+	CameraPosition []  SetPosition;
 	public int    FileType;
+	//Constants
+	double kr; 
+	double delta_r;
+	double mass_oleic;
+	double B0;
+	double C1;
+	double C5;
+	double mass_car;
+	double start_scale;
+	double dt;
+	double N_o;
+	double t_temp;
+	
 	
 	public Parameters (String path) {
 		rf=new ReadFile(path);
 	
 	                            //Mathematical Constants
-	pi                   = rf.get("MathConst", "pi", 1.0);
+	pi                   = rf.get("MathConst", "pi",      1.0);
 								//Physics Constants
 	mu0                  = rf.get("PhysConst", "mu0",     1.0); 
-	muB			 	     = rf.get("PhysConst", "muB", 	1.0);
-	R 		     	     = rf.get("PhysConst", "R", 		1.0);
+	muB			 	     = rf.get("PhysConst", "muB", 	  1.0);
+	R 		     	     = rf.get("PhysConst", "R", 	  1.0);
 	Na 		     	     = rf.get("PhysConst", "Na",      1.0);
 	g 		     	     = rf.get("PhysConst", "g",       1.0);
 	kb 		     	     = rf.get("PhysConst", "kb",      1.0);
@@ -191,7 +125,7 @@ public class Parameters {
 	 							//Space Parameters
 	gl_scale       	     = rf.get("Space", "gl_scale",     1.0);
 	nano_size      	     = rf.get("Space", "nano_size",    1.0);
-	elta_r_init    	     = rf.get("Space", "delta_r_init", 1.0);
+	delta_r_init    	 = rf.get("Space", "delta_r_init", 1.0);
 	is_periodic     	 = rf.get("Space", "is_periodic",  1.0);
 	 						 	//Experimental Parameters of Materials
 	a0 	 	     	     = rf.get("ExperimentalMaterial", "a0",             1.0);
@@ -225,141 +159,83 @@ public class Parameters {
 	BmanX 	 	         = rf.get("ExperimentalConditions", "BmanX",    -5);
 	BmanY 	 	         = rf.get("ExperimentalConditions", "BmanY",    -5);
 	BmanZ 	 	         = rf.get("ExperimentalConditions", "BmanZ",    -5);
+	pN  	 	         = rf.get("ExperimentalConditions", "pN",    -5);
 	                          //Simulation Setup
 	isAutoSetPosition    = rf.get("SimulationSetup", "isAutoSetPosition",     -5);
-	distances 	         = rf.get("SimulationSetup", "distances", 			1.0);
-	isShowInfo           = rf.get("SimulationSetup", "isShowInfo",		    -5);
+	distances 	         = rf.get("SimulationSetup", "distances", 			  1.0);
+	isShowInfo           = rf.get("SimulationSetup", "isShowInfo",		      -5);
 	dt0        	         = rf.get("SimulationSetup", "dt0",                   1.0);
 	slow_steps           = rf.get("SimulationSetup", "slow_steps",            -5);
-	smooth_r  	         = rf.get("SimulationSetup", "smooth_r", 		        1.0);
-	is_large_mode        = rf.get("SimulationSetup", "is_large_mode",         -5);
+	smooth_r  	         = rf.get("SimulationSetup", "smooth_r", 		      1.0);
+	is_large_mode        = rf.get("SimulationSetup", "is_large_mode",         true);
 	large_fraction       = rf.get("SimulationSetup", "large_fraction",        1.0);
 	k_large  	         = rf.get("SimulationSetup", "k_large",               1.0);
 	load_at_start        = rf.get("SimulationSetup", "load_at_start",         -5);
-	auto_save 		     = rf.get("SimulationSetup", "auto_save", 			-5);
+	auto_save 		     = rf.get("SimulationSetup", "auto_save", 			  -5);
 	manual_field_control = rf.get("SimulationSetup", "manual_field_control",  -5);
-	ext_field_is_homo    = rf.get("SimulationSetup", "ext_field_is_homo", 	-5);
-	auto_reversal  	     = rf.get("SimulationSetup", "auto_reversal",	        -5);
-	setting_plot         = rf.get("SimulationSetup", "setting_plot",		    -5);
-	start_ideal  	     = rf.get("SimulationSetup", "start_ideal", 		    -5);
+	ext_field_is_homo    = rf.get("SimulationSetup", "ext_field_is_homo", 	  -5);
+	auto_reversal  	     = rf.get("SimulationSetup", "auto_reversal",	      -5);
+	setting_plot         = rf.get("SimulationSetup", "setting_plot",		  -5);
+	start_ideal  	     = rf.get("SimulationSetup", "start_ideal",           true);
 	ScreenCaptureStep    = rf.get("SimulationSetup", "ScreenCaptureStep",     -5);
 	AnalysisStep   	     = rf.get("SimulationSetup", "AnalysisStep",          -5);
+	
 						        //Model Size Dispersion
-	d1        	         = rf.get("ModelSizeDispersion", "d1",  1.0);
-	F1 	                 = rf.get("ModelSizeDispersion", "F1",  1.0);
-	d2        	         = rf.get("ModelSizeDispersion", "d2",  1.0);
-	F2 	                 = rf.get("ModelSizeDispersion", "F2",  1.0);
-	d3        	         = rf.get("ModelSizeDispersion", "d3",  1.0);
-	F3 	                 = rf.get("ModelSizeDispersion", "F3",  1.0);
-	d4        	         = rf.get("ModelSizeDispersion", "d4",  1.0);
-	F4 	                 = rf.get("ModelSizeDispersion", "F4",  1.0);
-	d5        	         = rf.get("ModelSizeDispersion", "d5",  1.0);
-	F5 	                 = rf.get("ModelSizeDispersion", "F5",  1.0);
-	d6        	         = rf.get("ModelSizeDispersion", "d6",  1.0);
-	F6 	                 = rf.get("ModelSizeDispersion", "F6",  1.0);
-	d7        	         = rf.get("ModelSizeDispersion", "d7",  1.0);
-	F7 	                 = rf.get("ModelSizeDispersion", "F7",  1.0);
-	d8        	         = rf.get("ModelSizeDispersion", "d8",  1.0);
-	F8 	                 = rf.get("ModelSizeDispersion", "F8",  1.0);
-	d9        	         = rf.get("ModelSizeDispersion", "d9",  1.0);
-	F9 	                 = rf.get("ModelSizeDispersion", "F9",  1.0);
-	d10        	         = rf.get("ModelSizeDispersion", "d10", 1.0);
-	F10 	             = rf.get("ModelSizeDispersion", "F10", 1.0);
-	d11        	         = rf.get("ModelSizeDispersion", "d11", 1.0);
-	F11 	             = rf.get("ModelSizeDispersion", "F11", 1.0);
-	d12        	         = rf.get("ModelSizeDispersion", "d12", 1.0);
-	F12 	             = rf.get("ModelSizeDispersion", "F12", 1.0);
-	d13        	         = rf.get("ModelSizeDispersion", "d13", 1.0);
-	F13 	             = rf.get("ModelSizeDispersion", "F13", 1.0);
-	d14        	         = rf.get("ModelSizeDispersion", "d14", 1.0);
-	F14 	             = rf.get("ModelSizeDispersion", "F14", 1.0);
+	N_points 			=rf.get("ModelSizeDispersion", "N_points", -5);
+	Diameter_And_Concentration= new Vector_2D[15];
+	for (int i=1; i<=N_points; i++) {
+		String d="d"+i;
+		String F="F"+i;
+		Diameter_And_Concentration[i]=new Vector_2D(rf.get("ModelSizeDispersion", d,  1.0), rf.get("ModelSizeDispersion", F,  1.0));
+	}
+	
 								 // Set Position
 	PositionMax          = rf.get("SetPosition", "PositionMax", -5);
-	x1 	                 = rf.get("SetPosition", "x1", 1.0);
-	y1 	                 = rf.get("SetPosition", "y1", 1.0);
-	z1 	                 = rf.get("SetPosition", "z1", 1.0);
-	pts1                 = rf.get("SetPosition", "pts1", -5);
-	x2 	                 = rf.get("SetPosition", "x2", 1.0);
-	y2 	                 = rf.get("SetPosition", "y2", 1.0);
-	z2 	                 = rf.get("SetPosition", "z2", 1.0);
-	pts2                 = rf.get("SetPosition", "pts2", -5);
-	x3 	                 = rf.get("SetPosition", "x3", 1.0);
-	y3 	                 = rf.get("SetPosition", "y3", 1.0);
-	z3 	                 = rf.get("SetPosition", "z3", 1.0);
-	pts3                 = rf.get("SetPosition", "pts3", -5);
-	x4 	                 = rf.get("SetPosition", "x4", 1.0);
-	y4 	                 = rf.get("SetPosition", "y4", 1.0);
-	z4 	                 = rf.get("SetPosition", "z4", 1.0);
-	pts4                 = rf.get("SetPosition", "pts4", -5);
-	x5 	                 = rf.get("SetPosition", "x5", 1.0);
-	y5 	                 = rf.get("SetPosition", "y5", 1.0);
-	z5 	                 = rf.get("SetPosition", "z5", 1.0);
-	pts5                 = rf.get("SetPosition", "pts5", -5);
-	x6 	                 = rf.get("SetPosition", "x6", 1.0);
-	y6 	                 = rf.get("SetPosition", "y6", 1.0);
-	z6 	                 = rf.get("SetPosition", "z6", 1.0);
-	pts6                 = rf.get("SetPosition", "pts6", -5);
+	SetPosition =new CameraPosition [PositionMax+1];
+	for (int i=1; i<=PositionMax; i++) {
+		String x="x"+i;
+		String y="y"+i;
+		String z="z"+i;
+		String pts="pts"+i;
+		SetPosition[i]=new CameraPosition(rf.get("SetPosition", x, 1.0), rf.get("SetPosition", y, 1.0), rf.get("SetPosition", z, 1.0), rf.get("SetPosition", pts, -5));
+	}
+	
 		                        //EtaCarPoints
 	n                    = rf.get("EtaCarPoints", "n",   -5);
-	T0                   = rf.get("EtaCarPoints", "T0",  -5);
-	T1                   = rf.get("EtaCarPoints", "T1",  -5);
-	T2                   = rf.get("EtaCarPoints", "T2",  -5);
-	T3                   = rf.get("EtaCarPoints", "T3",  -5);
-	T4                   = rf.get("EtaCarPoints", "T4",  -5);
-	T5                   = rf.get("EtaCarPoints", "T5",  -5);
-	T6                   = rf.get("EtaCarPoints", "T6",  -5);
-	T7                   = rf.get("EtaCarPoints", "T7",  -5);
-	T8                   = rf.get("EtaCarPoints", "T8",  -5);
-	T9                   = rf.get("EtaCarPoints", "T9",  -5);
-	T10                  = rf.get("EtaCarPoints", "T10", -5);
-	T11                  = rf.get("EtaCarPoints", "T11", -5);
-	T12                  = rf.get("EtaCarPoints", "T12", -5);
-	T13                  = rf.get("EtaCarPoints", "T13", -5);
-	T14                  = rf.get("EtaCarPoints", "T14", -5);
-	T15                  = rf.get("EtaCarPoints", "T15", -5);
-	T16                  = rf.get("EtaCarPoints", "T16", -5);
-	T17                  = rf.get("EtaCarPoints", "T17", -5);
-	T18                  = rf.get("EtaCarPoints", "T18", -5);
-	T19                  = rf.get("EtaCarPoints", "T19", -5);
-	T20                  = rf.get("EtaCarPoints", "T20", -5);
-	T21                  = rf.get("EtaCarPoints", "T21", -5);
-	T22                  = rf.get("EtaCarPoints", "T22", -5);
-	T23                  = rf.get("EtaCarPoints", "T23", -5);
-	T24                  = rf.get("EtaCarPoints", "T24", -5);
-    T25                  = rf.get("EtaCarPoints", "T25", -5);
-	T26                  = rf.get("EtaCarPoints", "T26", -5);
-	T27                  = rf.get("EtaCarPoints", "T27", -5);
 	
-	eta0                 = rf.get("EtaCarPoints", "eta0",  1.0);
-	eta1                 = rf.get("EtaCarPoints", "eta1",  1.0);
-	eta2                 = rf.get("EtaCarPoints", "eta2",  1.0);
-	eta3                 = rf.get("EtaCarPoints", "eta3",  1.0);
-	eta4                 = rf.get("EtaCarPoints", "eta4",  1.0);
-	eta5                 = rf.get("EtaCarPoints", "eta5",  1.0);
-	eta6                 = rf.get("EtaCarPoints", "eta6",  1.0);
-	eta7                 = rf.get("EtaCarPoints", "eta7",  1.0);
-	eta8                 = rf.get("EtaCarPoints", "eta8",  1.0);
-	eta9                 = rf.get("EtaCarPoints", "eta9",  1.0);
-	eta10                = rf.get("EtaCarPoints", "eta10", 1.0);
-	eta11                = rf.get("EtaCarPoints", "eta11", 1.0);
-	eta12                = rf.get("EtaCarPoints", "eta12", 1.0);
-	eta13                = rf.get("EtaCarPoints", "eta13", 1.0);
-	eta14                = rf.get("EtaCarPoints", "eta14", 1.0);
-	eta15                = rf.get("EtaCarPoints", "eta15", 1.0);
-	eta16                = rf.get("EtaCarPoints", "eta16", 1.0);
-	eta17                = rf.get("EtaCarPoints", "eta17", 1.0);
-	eta18                = rf.get("EtaCarPoints", "eta18", 1.0);
-	eta19                = rf.get("EtaCarPoints", "eta19", 1.0);
-	eta20                = rf.get("EtaCarPoints", "eta20", 1.0);
-	eta21                = rf.get("EtaCarPoints", "eta21", 1.0);
-	eta22                = rf.get("EtaCarPoints", "eta22", 1.0);
-	eta23                = rf.get("EtaCarPoints", "eta23", 1.0);
-	eta24                = rf.get("EtaCarPoints", "eta24", 1.0);
-	eta25                = rf.get("EtaCarPoints", "eta25", 1.0);
-	eta26                = rf.get("EtaCarPoints", "eta26", 1.0);
-	eta27                = rf.get("EtaCarPoints", "eta27", 1.0);
+	Temperature_And_Viscosity = new Vector_2D [n];
+	for (int i=0; i<n; i++)
+	{
+		String T="T"+i;
+		String eta="eta"+i;		
+		Temperature_And_Viscosity[i]=new Vector_2D (rf.get("EtaCarPoints", T,  1.0), rf.get("EtaCarPoints", eta,  1.0));
+	}
+
 									//Image   Settings
 	FileType             = rf.get("ImageSettings", "FileType", -5);
+	
+	// Constants
+	kr					=gl_scale; 
+	delta_r				=0.5*a0;
+	mass_oleic			=ro_oleic*v_oleic;
+	B0					=2500*79.577*mu0;
+	C1					=3*mu0/(4*pi);
+	C5					=mu0/(4*pi);
+	mass_car			=ro0*v_car;
+	start_scale			=0.99;
+	dt					=dt0;
+    N_o					=(N_oa*k_o)/0.5;
+    t_temp				=T+ta0;
+    
+   
+    
+	}
+	public double ViscosityOfOleicAcids () {
+		 if(t_temp>90) t_temp=90;
+		    if(t_temp<20) t_temp=20;
+		return eta_oleic=(a3_eta_oleic*Math.pow(t_temp, 3))+
+		   (a2_eta_oleic*Math.pow(t_temp, 2))+
+		   (a1_eta_oleic*Math.pow(t_temp, 1))+ a0_eta_oleic;
 	}
 	
 }
